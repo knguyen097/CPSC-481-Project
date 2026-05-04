@@ -1,75 +1,153 @@
-"""Connect 4 game logic."""
+"""Connect 4 game logic.
+
+This file does not depend on the terminal or Pygame.
+It only handles the board, valid moves, piece dropping, and win checking.
+"""
+
 ROWS = 6
 COLS = 7
 
+EMPTY = 0
+PLAYER = 1
+AI_PLAYER = 2
+
+
 class Connect4:
     def __init__(self):
-        self.board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
+        self.board = [[EMPTY for _ in range(COLS)] for _ in range(ROWS)]
+
+    def reset(self):
+        self.board = [[EMPTY for _ in range(COLS)] for _ in range(ROWS)]
 
     def copy(self):
-        g = Connect4()
-        g.board = [row[:] for row in self.board]
-        return g
+        new_game = Connect4()
+        new_game.board = [row[:] for row in self.board]
+        return new_game
 
     def valid_moves(self):
-        return [c for c in range(COLS) if self.board[0][c] == 0]
+        return [col for col in range(COLS) if self.board[0][col] == EMPTY]
+
+    def is_valid_move(self, col):
+        if col is None:
+            return False
+
+        return 0 <= col < COLS and self.board[0][col] == EMPTY
+    
+    def get_drop_row(self, col):
+        """Return the row where a piece would land in the given column.
+
+        Returns None if the column is invalid or full.
+        """
+        if col is None:
+            return None
+
+        if not self.is_valid_move(col):
+            return None
+
+        for row in range(ROWS - 1, -1, -1):
+            if self.board[row][col] == EMPTY:
+                return row
+
+        return None
 
     def drop_piece(self, col, player):
-        if col < 0 or col >= COLS or self.board[0][col] != 0:
+        """Drop a piece into a column.
+
+        Returns True if the move worked.
+        Returns False if the column is full or out of range.
+        """
+        if not self.is_valid_move(col):
             return False
-        for r in range(ROWS-1, -1, -1):
-            if self.board[r][col] == 0:
-                self.board[r][col] = player
+
+        for row in range(ROWS - 1, -1, -1):
+            if self.board[row][col] == EMPTY:
+                self.board[row][col] = player
                 return True
+
         return False
 
     def is_full(self):
-        return all(self.board[0][c] != 0 for c in range(COLS))
-
-    def _check_direction(self, start_r, start_c, dr, dc):
-        player = self.board[start_r][start_c]
-        if player == 0:
-            return False
-        r, c = start_r, start_c
-        count = 0
-        while 0 <= r < ROWS and 0 <= c < COLS and self.board[r][c] == player:
-            count += 1
-            r += dr; c += dc
-        return count
+        return all(self.board[0][col] != EMPTY for col in range(COLS))
 
     def check_win(self):
-        # returns 0 = no win, 1 or 2 for winner
-        for r in range(ROWS):
-            for c in range(COLS):
-                p = self.board[r][c]
-                if p == 0:
+        """Return 0 for no winner, 1 for player, or 2 for AI."""
+        for row in range(ROWS):
+            for col in range(COLS):
+                player = self.board[row][col]
+
+                if player == EMPTY:
                     continue
-                # check horizontal
-                if c <= COLS-4 and all(self.board[r][c+i] == p for i in range(4)):
-                    return p
-                # vertical
-                if r <= ROWS-4 and all(self.board[r+i][c] == p for i in range(4)):
-                    return p
-                # diag down-right
-                if r <= ROWS-4 and c <= COLS-4 and all(self.board[r+i][c+i] == p for i in range(4)):
-                    return p
-                # diag up-right
-                if r >= 3 and c <= COLS-4 and all(self.board[r-i][c+i] == p for i in range(4)):
-                    return p
-        return 0
+
+                # Horizontal
+                if col <= COLS - 4 and all(self.board[row][col + i] == player for i in range(4)):
+                    return player
+
+                # Vertical
+                if row <= ROWS - 4 and all(self.board[row + i][col] == player for i in range(4)):
+                    return player
+
+                # Diagonal down-right
+                if row <= ROWS - 4 and col <= COLS - 4 and all(self.board[row + i][col + i] == player for i in range(4)):
+                    return player
+
+                # Diagonal up-right
+                if row >= 3 and col <= COLS - 4 and all(self.board[row - i][col + i] == player for i in range(4)):
+                    return player
+
+        return EMPTY
+
+    def winning_cells(self):
+        """Return the four winning board positions so the UI can highlight them."""
+        directions = [
+            (0, 1),    # horizontal
+            (1, 0),    # vertical
+            (1, 1),    # diagonal down-right
+            (-1, 1),   # diagonal up-right
+        ]
+
+        for row in range(ROWS):
+            for col in range(COLS):
+                player = self.board[row][col]
+
+                if player == EMPTY:
+                    continue
+
+                for row_step, col_step in directions:
+                    cells = []
+
+                    for i in range(4):
+                        next_row = row + row_step * i
+                        next_col = col + col_step * i
+
+                        if 0 <= next_row < ROWS and 0 <= next_col < COLS:
+                            cells.append((next_row, next_col))
+
+                    if len(cells) == 4 and all(self.board[r][c] == player for r, c in cells):
+                        return cells
+
+        return []
 
     def render(self):
+        """Optional text rendering for debugging only.
+
+        The Pygame version does not use this during normal gameplay.
+        """
         lines = []
-        for r in range(ROWS):
-            row = []
-            for c in range(COLS):
-                v = self.board[r][c]
-                if v == 0:
-                    row.append('.')
-                elif v == 1:
-                    row.append('X')
+
+        for row in range(ROWS):
+            pieces = []
+
+            for col in range(COLS):
+                value = self.board[row][col]
+
+                if value == EMPTY:
+                    pieces.append(".")
+                elif value == PLAYER:
+                    pieces.append("X")
                 else:
-                    row.append('O')
-            lines.append(' '.join(row))
-        header = ' '.join(str(i+1) for i in range(COLS))
-        return '\n'.join(lines) + '\n' + header
+                    pieces.append("O")
+
+            lines.append(" ".join(pieces))
+
+        header = " ".join(str(i + 1) for i in range(COLS))
+        return "\n".join(lines) + "\n" + header
