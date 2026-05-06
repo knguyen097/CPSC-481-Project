@@ -17,8 +17,8 @@ import random
 from connect4 import Connect4, ROWS, COLS, EMPTY, PLAYER, AI_PLAYER
 
 # Large values are used so guaranteed wins/losses are ranked above normal board scores.
-WIN_SCORE = 1_000_000_000
-LOSE_SCORE = -1_000_000_000
+WIN_SCORE = 100000
+LOSE_SCORE = -100000
 
 def get_opponent(player):
     """Return the opposing player value."""
@@ -251,9 +251,9 @@ def choose_move(game: Connect4, player_id: int, difficulty: str = "medium"):
     # Medium searches fewer moves ahead.
     # Hard searches deeper, making it stronger but slightly slower.
     if difficulty == "medium":
-        depth = 3
+        depth = 2
     else:
-        depth = 5
+        depth = 4
 
     col, _ = minimax(
         game,
