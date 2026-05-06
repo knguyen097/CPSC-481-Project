@@ -14,10 +14,8 @@ The game includes a main menu, difficulty selection, mouse controls, a pause men
 - Easy, Medium, and Hard difficulty options
 - Mouse-click controls
 - Highlight preview showing where the player piece will land
-- Falling piece animation
 - Pause menu during gameplay
 - Restart and main menu options after the game ends
-- Winning pieces are highlighted
 
 ---
 
