@@ -24,6 +24,7 @@ class GameApp:
 
         self.clock = pygame.time.Clock()
         self.renderer = Renderer(self.screen)
+        self.stats = self.create_stats()
         self.data = self.reset_game()
         self.running = True
 
@@ -82,6 +83,13 @@ class GameApp:
             "winning_cells": [],
             "ai_move_time": 0,
         }
+    def create_stats(self):
+        """Create win/loss/draw stats for the current play session."""
+        return {
+        "player_wins": 0,
+        "ai_wins": 0,
+        "draws": 0,
+    }
 
     def run(self):
         """Run the main Pygame loop."""
@@ -189,6 +197,26 @@ class GameApp:
             self.data["message"] = "AI is thinking..."
             self.data["ai_move_time"] = pygame.time.get_ticks() + 400
 
+    def record_result(self, winner):
+        """Update the win tracker after a game ends."""
+        if winner == PLAYER:
+            self.stats["player_wins"] += 1
+
+        elif winner == AI_PLAYER:
+            self.stats["ai_wins"] += 1
+
+        else:
+            self.stats["draws"] += 1
+      
+      
+    def create_stats(self):
+        """Create win/loss/draw stats for the current play session."""
+        return {
+            "player_wins": 0,
+            "ai_wins": 0,
+            "draws": 0,
+        }      
+        
     def finish_turn(self):
         """Handle what happens after a player or AI finishes a move.
 
@@ -199,6 +227,8 @@ class GameApp:
         winner = game.check_win()
 
         if winner != EMPTY:
+            self.record_result(winner)
+            
             self.data["winner"] = winner
             self.data["winning_cells"] = game.winning_cells()
             self.data["state"] = "game_over"
@@ -211,6 +241,8 @@ class GameApp:
             return
 
         if game.is_full():
+            self.record_result(EMPTY)
+            
             self.data["state"] = "game_over"
             self.data["message"] = "Draw game!"
             return
@@ -254,7 +286,12 @@ class GameApp:
             self.renderer.draw_menu(self.data, self.difficulty_buttons)
 
         elif self.data["state"] == "paused":
-            self.renderer.draw_game(self.data, self.restart_button, self.menu_button)
+            self.renderer.draw_game(
+                self.data, 
+                self.restart_button, 
+                self.menu_button, 
+                self.stats,
+                )
             self.renderer.draw_pause_menu(
                 self.resume_button,
                 self.pause_menu_button,
@@ -262,4 +299,9 @@ class GameApp:
             )
 
         else:
-            self.renderer.draw_game(self.data, self.restart_button, self.menu_button)
+            self.renderer.draw_game(
+                self.data, 
+                self.restart_button, 
+                self.menu_button, 
+                self.stats,
+            )

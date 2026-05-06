@@ -128,7 +128,38 @@ class Renderer:
             HEIGHT - 60,
         )
 
-    def draw_game(self, data, restart_button, menu_button):
+    def draw_stats(self, stats):
+        """Draw the current session win/loss stats."""
+        if stats is None:
+            return
+
+        player_wins = stats["player_wins"]
+        ai_wins = stats["ai_wins"]
+        draws = stats["draws"]
+        total_games = player_wins + ai_wins + draws
+
+        if total_games == 0:
+            player_rate = 0
+            ai_rate = 0
+        else:
+            player_rate = (player_wins / total_games) * 100
+            ai_rate = (ai_wins / total_games) * 100
+
+        stats_text = (
+            f"You: {player_wins} wins ({player_rate:.0f}%)  |  "
+            f"AI: {ai_wins} wins ({ai_rate:.0f}%)  |  "
+            f"Draws: {draws}"
+        )
+
+        self.draw_text(
+            stats_text,
+            17,
+            WIDTH // 2,
+            140,
+            TEXT_DARK,
+        )
+
+    def draw_game(self, data, restart_button, menu_button, stats=None):
         """Draw the gameplay screen.
 
         This includes the title, current message, board, piece preview,
@@ -138,6 +169,7 @@ class Renderer:
 
         self.draw_text("Connect 4", 36, WIDTH // 2, 35, TEXT_DARK, bold=True)
         self.draw_text(data["message"], 26, WIDTH // 2, 82, TEXT_DARK)
+        
         self.draw_text(
             f"Difficulty: {data['difficulty'].capitalize()}",
             20,
@@ -145,6 +177,8 @@ class Renderer:
             118,
             TEXT_DARK,
         )
+        
+        self.draw_stats(stats)
         self.draw_text("Press P or Esc to pause", 18, WIDTH // 2, HEIGHT - 15, TEXT_DARK)
 
         self.draw_board(data["game"], data["winning_cells"])
@@ -210,7 +244,7 @@ class Renderer:
         overlay.fill((0, 0, 0, 140))
         self.screen.blit(overlay, (0, 0))
 
-        self.draw_text("Paused", 52, WIDTH // 2, HEIGHT // 2 - 170, WHITE, bold=True)
+        self.draw_text("Paused", 52, WIDTH // 2, HEIGHT // 2 - 100, WHITE, bold=True)
 
         self.draw_button(resume_button, "Resume")
         self.draw_button(pause_menu_button, "Main Menu")

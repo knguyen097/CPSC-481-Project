@@ -144,7 +144,7 @@ def minimax(game, depth, alpha, beta, maximizing_player, player_id):
     if winner == player_id:
         return None, WIN_SCORE + depth
 
-    # Case: the opponent has won.
+    # Case: the Opponent has won.
     # Subtracting depth makes earlier losses worse than later losses.
     if winner == opponent:
         return None, LOSE_SCORE - depth

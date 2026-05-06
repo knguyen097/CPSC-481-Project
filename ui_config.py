@@ -8,7 +8,7 @@ from connect4 import ROWS, COLS
 
 # Board and window sizing.
 CELL_SIZE = 90
-BOARD_TOP = 150
+BOARD_TOP = 170
 WIDTH = COLS * CELL_SIZE
 HEIGHT = BOARD_TOP + ROWS * CELL_SIZE + 30
 RADIUS = CELL_SIZE // 2 - 8
