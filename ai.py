@@ -52,7 +52,7 @@ def score_window(window, player):
     elif window.count(player) == 3 and window.count(EMPTY) == 1:
         score += 8
     elif window.count(player) == 2 and window.count(EMPTY) == 2:
-        score += 3
+        score += 2
 
     # Penalize the score when the opponent has dangerous patterns.
     # This encourages the AI to block the player.
@@ -61,7 +61,7 @@ def score_window(window, player):
     elif window.count(opponent) == 3 and window.count(EMPTY) == 1:
         score -= 10
     elif window.count(opponent) == 2 and window.count(EMPTY) == 2:
-        score -= 2
+        score -= 3
 
     return score
 

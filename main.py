@@ -3,7 +3,6 @@
 
 from game_app import GameApp
 
-
 def main():
     """Create and run the game app."""
     app = GameApp()
