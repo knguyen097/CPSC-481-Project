@@ -83,13 +83,6 @@ class GameApp:
             "winning_cells": [],
             "ai_move_time": 0,
         }
-    def create_stats(self):
-        """Create win/loss/draw stats for the current play session."""
-        return {
-        "player_wins": 0,
-        "ai_wins": 0,
-        "draws": 0,
-    }
 
     def run(self):
         """Run the main Pygame loop."""
