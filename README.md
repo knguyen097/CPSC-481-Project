@@ -171,7 +171,7 @@ The AI also checks for immediate winning moves and blocks the player when the pl
 
 ## Troubleshooting
 
-### Pygame is not installed
+### pygame is not installed
 
 If you see this error:
 
